@@ -1,0 +1,346 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>CS 723 Project 2: Syntactic Parsing</title>
+<style type="text/css">
+<!--
+.style1 {
+font-style: italic;
+font-weight: bold;
+}
+-->
+</style>
+<link href="project.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<h2>CS 723 Project 2: Syntactic Parsing</h2>
+
+<h3>Table of Contents</h3>
+<ul>
+<li><a href="#intro">Introduction</a>
+<li><a href="#unary">Unary Rules in CKY (25%)</a>
+<li><a href="#timeflies">Warming up with Time Flies (25%)</a>
+<li><a href="#parsing">Parsing English (50%)</a>
+</ul>
+
+<h3><a name="intro">Introduction</a></h3>
+
+In contrast to P1, where most of the info was here, this doc is now
+just a schematic and the main details are in the relevant .py files.
+We're doing parsing :).
+
+<p>The code for this project consists of several Python files, some of
+which you will need to read and understand in order to complete the
+assignment, and some of which you can ignore. You can download all the
+code and supporting files (including this description) as
+a <a href="p1.tar.gz">tar archive</a>.
+
+<table border="0" cellpadding="10">
+<tr><td colspan="2"><b>Files you'll edit:</b></td></tr>
+  
+  <tr><td><code>extractGrammar.py</code></td>
+  <td>The place where you'll put your code for part III (parsing English).</td></tr>
+  
+  <tr><td><code>grammar.py</code></td>
+  <td>The place where you'll put your code for part II (time flies).</td></tr>
+  
+  <tr><td><code>parser.py</code></td>
+  <td>The place where you'll put your code for part I (cky).</td></tr>
+  
+<tr><td colspan="2"><b>Files you might want to look at:</b></td></tr>
+  
+  <tr><td><code>tree.py</code></td>
+  <td>The tree data structure we'll use.</td></tr>
+
+  <tr><td><code>util.py</code></td>
+  <td>A handful of useful utility functions: these will undoubtedly be helpful to you, so take a look!</td></tr>
+</table>
+<p>
+
+<p><strong>Evaluation:</strong> Your code will be autograded for
+technical correctness. Please <em>do not</em> change the names of any
+provided functions or classes within the code, or you will wreak havoc
+on the autograder.  However, the correctness of your implementation --
+not the autograder's output -- will be the final judge of your score.
+If necessary, we will review and grade assignments individually to
+ensure that you receive due credit for your work.
+
+<p><strong>Academic Dishonesty:</strong> We will be checking your code
+against other submissions in the class for logical redundancy. If you
+copy someone else's code and submit it with minor changes, we will
+know. These cheat detectors are quite hard to fool, so please don't
+try. We trust you all to submit your own work only; <em>please</em>
+don't let us down. If you do, we will pursue the strongest
+consequences available to us.
+
+<p><strong>Getting Help:</strong> You are not alone!  If you find
+yourself stuck on something, contact the course staff for help.
+Office hours, class time, and Piazza are there for your support;
+please use them.  If you can't make our office hours, let us know and
+we will schedule more.  We want these projects to be rewarding and
+instructional, not frustrating and demoralizing.  But, we don't know
+when or how to help unless you ask.  One more piece of advice: if you
+don't know what a variable is, print it out.
+
+<h3><a name="unary"></a>Unary Rules in CKY <i>(25%)</i></h3>
+
+Open up <tt>parser.py</tt>.  I've given you an almost-complete
+implementation of CKY.  It initializes the bottom cells of the chart,
+then applies unary rules there, and applies binary rules in the entire
+chart.  All you have to do is apply unary rules in the recursive
+case.  If you've correctly implemented this, and loaded all the
+relevant files (util, tree, grammar and parser), you should be able to
+run:
+
+<pre>
+>>> print str(timeFliesPCFG)
+Noun => flies	| 0.4
+Noun => arrow	| 0.4
+Noun => time	| 0.2
+TOP => S	| 1.0
+Det => an	| 1.0
+VP => Verb PP	| 0.2
+VP => Verb NP_PP	| 0.1
+VP => Verb NP	| 0.6
+VP => Verb	| 0.1
+S => VP	| 0.2
+S => VP PP	| 0.1
+S => NP VP_PP	| 0.2
+S => NP VP	| 0.5
+VP_PP => VP PP	| 1.0
+NP_PP => NP PP	| 1.0
+Prep => like	| 1.0
+PP => Prep NP	| 1.0
+Verb => flies	| 0.5
+Verb => time	| 0.3
+Verb => like	| 0.2
+NP => Noun	| 0.3
+NP => Det Noun	| 0.7
+
+>>> print timeFliesSent
+['time', 'flies', 'like', 'an', 'arrow']
+
+>>> parse(timeFliesPCFG, timeFliesSent)
+(TOP: (S: (NP: (Noun: 'time')) (VP_PP: (VP: (Verb: 'flies')) (PP: (Prep: 'like') (NP: (Det: 'an') (Noun: 'arrow'))))))
+</pre>
+
+Note that you <i>cannot</i> get this output without correctly handling
+unary rules, because you'll never be able to get the <tt>TOP -&gt;
+  S</tt> at the top.
+
+<h3><a name="timeflies"></a>Warming up with Time Flies <i>(25%)</i></h3>
+
+The analysis from before gave us a specific interpretation of the time
+flies sentence.  Suppose we want to adjust the grammar so that we get
+a different (specific) interpretation.  Open up <tt>grammar.py</tt>
+and take a look at the definition of <tt>timeFliesPCFG</tt> and the
+desired analysis, in <tt>desiredTimeFliesParse</tt>.  Create
+a <i>new</i> grammar called <tt>timeFliesPCFG2</tt> that gives the
+same parse as in <tt>desiredTimeFliesParse</tt>.  Note: you may NOT
+change the rules of the grammar, and none of your probabilities may be
+less than 0.1 (and they must add to one in the appropriate places).
+You can compare your output to the desired tree with:
+
+<pre>
+>>> myTree = parse(timeFliesPCFG, timeFliesSent)
+>>> print myTree
+(TOP:
+  (S:
+    (NP: (Noun: 'time'))
+    (VP_PP:
+      (VP: (Verb: 'flies'))
+      (PP: (Prep: 'like') (NP: (Det: 'an') (Noun: 'arrow'))))))
+
+>>> print desiredTimeFliesParse
+(TOP:
+  (S:
+    (VP:
+      (Verb: 'time')
+      (NP_PP:
+        (NP: (Noun: 'flies'))
+        (PP: (Prep: 'like') (NP: (Det: 'an') (Noun: 'arrow')))))))
+
+>>> evaluate(desiredTimeFliesParse, myTree)
+0.70588235294117652
+</pre>
+
+This is the result using the grammar I gave you.  You should be able
+to get an evaluation (accuray) of 1.0.
+
+<h3><a name="parsing"></a>Parsing English <i>(50%)</i></h3>
+
+Your final task is to do a good job of parsing English.  Open
+up <tt>extractGrammar.py</tt> and take a look
+at <tt>computePCFG</tt>.  This will read data and compute a PCFG out
+of it.  For instance:
+
+<pre>
+>>> pcfg = computePCFG('wsj.dev')
+
+>>> len(pcfg)
+650
+
+>>> print str(pcfg)
+...
+PP => VBG PP	| 1
+PP => TO NP	| 23
+PP => IN ADJP	| 1
+PP => IN_NP NP	| 2
+PP => TO S	| 1
+PP => VBN PP	| 3
+PP => IN SBAR	| 1
+PP => IN NP	| 139
+...
+</pre>
+
+This shows that there are 650 unique rules in this PCFG, and that the
+most frequent PP rules were "TO NP" (count of 23) and "IN NP" (count
+of 139).  We can look at a larger data set:
+
+<pre>
+>>> pcfg = computePCFG('wsj.train')
+
+>>> len(pcfg)
+6048
+</pre>
+
+By default, this will learn a completely <i>unlexicalize</i> PCFG,
+which means that it can only parse POS sequences, as in the following
+two time-flies-esque examples:
+
+<pre>
+>>> parse(pcfg, ['NN', 'VBZ', 'IN', 'DT', 'NN'])
+(TOP: (S: (NP: 'NN') (VP: 'VBZ' (PP: 'IN' (NP: 'DT' 'NN')))))
+
+>>> parse(pcfg, ['VBZ', 'NN', 'IN', 'DT', 'NN'])
+(TOP: (S: (VP: (VBZ_NP: 'VBZ' (NP: 'NN')) (PP: 'IN' (NP: 'DT' 'NN')))))
+</pre>
+
+You'll notice that the tree that came out the second time is
+binarized.  We can de-binarize it:
+
+<pre>
+>>> print nonBinaryTree
+(TOP:
+  (S:
+    (NP:
+      (DT: 'the')
+      (RB: 'really')
+      (JJ: 'happy')
+      (NN: 'computer')
+      (NN: 'science')
+      (NN: 'student'))
+    (VP: (VBD: 'loves') (NP: (NNP: 'CL1')))
+    (.: '.')))
+
+>>> print binarizeTree(nonBinaryTree)
+(TOP:
+  (S:
+    (_NP_VP:
+      (NP:
+        (_DT_RB_JJ_NN_NN:
+          (_DT_RB_JJ_NN:
+            (_DT_RB_JJ:
+              (_DT_RB: (DT: 'the') (RB: 'really'))
+              (JJ: 'happy'))
+            (NN: 'computer'))
+          (NN: 'science'))
+        (NN: 'student'))
+      (VP: (VBD: 'loves') (NP: (NNP: 'CL1'))))
+    (.: '.')))
+
+>>> print debinarizeTree(binarizeTree(nonBinaryTree))
+(TOP:
+  (S:
+    (NP:
+      (DT: 'the')
+      (RB: 'really')
+      (JJ: 'happy')
+      (NN: 'computer')
+      (NN: 'science')
+      (NN: 'student'))
+    (VP: (VBD: 'loves') (NP: (NNP: 'CL1')))
+    (.: '.')))
+</pre>
+
+You'll note that this implementation of binarization does NO parent
+annotations (i.e., vertical order is 1 in the Klein+Manning notation)
+and complete markovization (i.e., horizontal order is infinity).
+One <b>very important thing</b> is that the debinarization assumes
+that any rule that's been binarized starts with "_".  So please
+maintain this invariant or debinarization won't work!<p/>
+
+You can evaluate this PCFG by loading <tt>parser.py</tt> and running:
+
+<pre>
+>>> evaluateParser(pcfg, 'wsj.dev')
+</pre>
+
+You might notice this takes <i>forever</i>.  So to make it faster, you
+can specify a pruning threshold.  A pruning threshold of 0.1 means
+that once a cell is filled up, take the probability of the best item
+in it.  Say that's probabiliy 0.23.  Multiply it by 0.1 to get 0.023.
+Now, anything else in that cell whose probability is <i>less than</i>
+0.023 will be deleted.  This will make parsing faster at the expense
+of accuracy.  You can pass this threshold to <tt>evaluateParser</tt>:
+
+<pre>
+>>> evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001)
+0.62969931444237581
+
+>>> evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.001)
+0.49305803094859446
+
+>>> evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.1)
+0.019573492787778504
+</pre>
+
+Your first task is to implement horizontal Markovization in
+the <tt>extractGrammar</tt> file.  You should be able to test this
+with:
+
+<pre>
+>>> pcfg = computePCFG('wsj.train', horizSize=2)
+>>> evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, horizSize=2)
+</pre>
+
+This implementation is worth 20%.<p/>
+
+Your second task is to implement vertical annotation (i.e., ancestor
+annotations).  Likewise, you can test this with:
+
+<pre>
+>>> pcfg = computePCFG('wsj.train', verticSize=2)
+>>> evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, verticSize=2)
+</pre>
+
+This implementation is also worth 20%.<p/>
+
+The final challenge (worth the last 10%) is to make the best
+unlexicalized grammar that you can.  You need to beat the best results
+of varying horizSize in the range {1, 2, 3, 4} and verticSize in { 1,
+2, 3, 4 }.  Any percentage point above the best of those that you get
+in accuracy, you'll get TWO percentage points on this task (up to
+5*2=10, of course :P).  Moreover, the top three teams will get extra
+credit of 10%, 7% and 5%, respectively, on this project.  You can run
+the test as:
+
+<pre>
+>>> runParserOnTest(pcfg, 'wsj.test', 'wsj.test.out', pruningPercent=0.001)
+</pre>
+
+You can also pass verticSize, horizSize to runParserOnTest.  You can
+also pass "runFancyCode=True" to both evaluateParser and
+runParserOnTest, which will pass this flag down to the binarizeTree
+function, and you can do whatever you want in there to try to get
+better performance.  The output of this will go
+to <tt>wsj.test.out</tt>, which you can submit for evaluation (running
+once per night until the last few days, at which point it will run
+once per hour).
+
+</body>
+</html>
