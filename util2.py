@@ -25,3 +25,13 @@ def printChart(chart, sentence, widths=(10,10,10,10,10), printBackPointers=True,
                     print '%*.*f' % (prec1, prec2, item.logProb),
 
                 print ''
+    print ''.ljust(columnWidth*(N+1), '_')
+
+def printItem(i,w=60): 
+    print str(i).center(w,'_')
+    print 'Left:\t',i.backPtrLeft
+    print 'Right:\t',i.backPtrRight
+    print 'Prob:\t',i.logProb
+    print 'Tree:\t',i.get_tree()
+    print ''.center(w,'_')
+
