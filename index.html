@@ -125,7 +125,7 @@ NP => Det Noun	| 0.7
 ['time', 'flies', 'like', 'an', 'arrow']
 
 >>> parse(timeFliesPCFG, timeFliesSent)
-(TOP: (S: (NP: (Noun: 'time')) (VP_PP: (VP: (Verb: 'flies')) (PP: (Prep: 'like') (NP: (Det: 'an') (Noun: 'arrow'))))))
+(TOP: (S: (NP: (Noun: 'time')) (VP: (Verb: 'flies') (PP: (Prep: 'like') (NP: (Det: 'an') (Noun: 'arrow'))))))
 </pre>
 
 Note that you <i>cannot</i> get this output without correctly handling
@@ -151,8 +151,8 @@ You can compare your output to the desired tree with:
 (TOP:
   (S:
     (NP: (Noun: 'time'))
-    (VP_PP:
-      (VP: (Verb: 'flies'))
+    (VP:
+      (Verb: 'flies')
       (PP: (Prep: 'like') (NP: (Det: 'an') (Noun: 'arrow'))))))
 
 >>> print desiredTimeFliesParse
@@ -160,12 +160,11 @@ You can compare your output to the desired tree with:
   (S:
     (VP:
       (Verb: 'time')
-      (NP_PP:
-        (NP: (Noun: 'flies'))
-        (PP: (Prep: 'like') (NP: (Det: 'an') (Noun: 'arrow')))))))
+      (NP: (Noun: 'flies'))
+      (PP: (Prep: 'like') (NP: (Det: 'an') (Noun: 'arrow'))))))
 
 >>> evaluate(desiredTimeFliesParse, myTree)
-0.70588235294117652
+0.75
 </pre>
 
 This is the result using the grammar I gave you.  You should be able
@@ -217,7 +216,7 @@ two time-flies-esque examples:
 (TOP: (S: (NP: 'NN') (VP: 'VBZ' (PP: 'IN' (NP: 'DT' 'NN')))))
 
 >>> parse(pcfg, ['VBZ', 'NN', 'IN', 'DT', 'NN'])
-(TOP: (S: (VP: (VBZ_NP: 'VBZ' (NP: 'NN')) (PP: 'IN' (NP: 'DT' 'NN')))))
+(TOP: (S: (VP: (_VBZ_NP: 'VBZ' (NP: 'NN')) (PP: 'IN' (NP: 'DT' 'NN')))))
 </pre>
 
 You'll notice that the tree that came out the second time is

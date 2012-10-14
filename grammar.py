@@ -158,8 +158,8 @@ timeFliesPCFG = PCFG({
 timeFliesSent = "time flies like an arrow".split()
 
 desiredTimeFliesParse = Tree("TOP", [Tree("S", [Tree("VP", [Tree("Verb", ["time"]),
-                                                            Tree("NP_PP", [Tree("NP", [Tree("Noun", ["flies"])]),
-                                                                           Tree("PP", [Tree("Prep", ["like"]),
-                                                                                       Tree("NP", [Tree("Det", ["an"]),
-                                                                                                   Tree("Noun", ["arrow"])])])])])])])
+                                                            Tree("NP", [Tree("Noun", ["flies"])]),
+                                                            Tree("PP", [Tree("Prep", ["like"]),
+                                                                        Tree("NP", [Tree("Det", ["an"]),
+                                                                                    Tree("Noun", ["arrow"])])])])])])
 
