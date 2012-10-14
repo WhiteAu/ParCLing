@@ -1,6 +1,7 @@
 from tree import *
 from util import *
 from math import *
+from grammar import *
 
 class Item:
     def __init__(self, i, j, label, logProb=0, backPtrLeft=None, backPtrRight=None):
@@ -142,8 +143,14 @@ def cky(pcfg, sent, pruningPercent=None):
                             chart.add(item)
 
             # try unary rules
-            ### TODO: YOUR CODE HERE
-            util.raiseNotDefined()
+            toAdd = []
+            for item in chart.iter_cell(i, i+k):
+                for lhs,ruleProb in pcfg.iter_unary_rules_on_rhs(item.label):
+                    newItem = Item(i, k, lhs, item.logProb + log(ruleProb), item)
+                    toAdd.append(newItem)
+
+            for item in toAdd:
+                chart.add(item)
 
             # prune the cell
             chart.prune_cell(i, k)
@@ -195,3 +202,14 @@ def runParserOnTest(pcfg, testFilename, outputFilename, pruningPercent=None, hor
             h.write('\n')
     sys.__stderr__.write('\n')
         
+if __name__ == '__main__':
+    #print str(timeFliesPCFG)
+    #print timeFliesSent
+    #print parse(timeFliesPCFG, timeFliesSent)
+    myTree = parse(timeFliesPCFG2, timeFliesSent)
+    print "desired".center(70,'_')
+    print desiredTimeFliesParse
+    print "actual".center(70,'_')
+    print myTree
+    print evaluate(desiredTimeFliesParse, myTree)
+

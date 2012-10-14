@@ -155,11 +155,37 @@ timeFliesPCFG = PCFG({
                RHS("like")  : 0.2 },
     "Prep" : { RHS("like")  : 1.0 }
     })
+
+timeFliesPCFG2 = PCFG({
+    "TOP"  : { RHS("S")            : 1.0 },
+    "S"    : { RHS("NP", "VP")     : 0.1,
+               RHS("VP")           : 0.7,
+               RHS("NP", "VP_PP")  : 0.1,
+               RHS("VP", "PP")     : 0.1 },
+    "VP_PP": { RHS("VP", "PP")     : 1.0 },
+    "NP"   : { RHS("Det", "Noun")  : 0.7,
+               RHS("Noun")         : 0.3 },
+    "VP"   : { RHS("Verb", "NP")   : 0.1, # lower
+               RHS("Verb", "PP")   : 0.1,
+               RHS("Verb", "NP_PP"): 0.7, # raise
+               RHS("Verb")         : 0.1 },
+    "NP_PP": { RHS("NP", "PP")     : 1.0 },
+    "PP"   : { RHS("Prep", "NP")   : 1.0 },
+    "Det"  : { RHS("an")    : 1.0 },
+    "Noun" : { RHS("time")  : 0.1,
+               RHS("flies") : 0.5,
+               RHS("arrow") : 0.4 },
+    "Verb" : { RHS("time")  : 0.4,
+               RHS("flies") : 0.4,
+               RHS("like")  : 0.2 },
+    "Prep" : { RHS("like")  : 1.0 }
+    })
+
 timeFliesSent = "time flies like an arrow".split()
 
 desiredTimeFliesParse = Tree("TOP", [Tree("S", [Tree("VP", [Tree("Verb", ["time"]),
-                                                            Tree("NP_PP", [Tree("NP", [Tree("Noun", ["flies"])]),
-                                                                           Tree("PP", [Tree("Prep", ["like"]),
-                                                                                       Tree("NP", [Tree("Det", ["an"]),
-                                                                                                   Tree("Noun", ["arrow"])])])])])])])
+                                                            Tree("NP", [Tree("Noun", ["flies"])]),
+                                                            Tree("PP", [Tree("Prep", ["like"]),
+                                                                        Tree("NP", [Tree("Det", ["an"]),
+                                                                                    Tree("Noun", ["arrow"])])])])])])
 
