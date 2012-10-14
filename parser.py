@@ -2,6 +2,7 @@ from tree import *
 from util import *
 from math import *
 from grammar import *
+from util2 import *
 
 class Item:
     def __init__(self, i, j, label, logProb=0, backPtrLeft=None, backPtrRight=None):
@@ -131,6 +132,7 @@ def cky(pcfg, sent, pruningPercent=None):
     for spanSize in range(2,N+1):
         for i in range(N-spanSize+1):
             k = i + spanSize
+            #print i,k
             for j in range(i+1, k):
                 # consider creating a cell spanning i -> k, with a split
                 # point at k.  in other words, we want to merge [i,j] with
@@ -140,18 +142,22 @@ def cky(pcfg, sent, pruningPercent=None):
                         for lhs,ruleProb in pcfg.iter_binary_rules_on_rhs(rhs1.label, rhs2.label):
                             # make a new item
                             item = Item(i, k, lhs, rhs1.logProb + rhs2.logProb + log(ruleProb), rhs1, rhs2)
+                            #printItem(item)
                             chart.add(item)
 
             # try unary rules
             toAdd = []
-            #for item in chart.iter_cell(i, i+k):
             for item in chart.iter_cell(i, k):
                 for lhs,ruleProb in pcfg.iter_unary_rules_on_rhs(item.label):
-                    newItem = Item(i, k, lhs, item.logProb + log(ruleProb), item)
+                    newItem = (i, k, lhs, item.logProb + log(ruleProb), item.label)
                     toAdd.append(newItem)
 
             for item in toAdd:
-                chart.add(item)
+                (i, k, lhs, logProb, rhsLabel) = item
+                rhs = chart.best_in_cell(i,k,rhsLabel)
+                newItem = Item(i, k, lhs, logProb, rhs)
+                #printItem(newItem)
+                chart.add(newItem)
 
             # prune the cell
             chart.prune_cell(i, k)
@@ -204,9 +210,22 @@ def runParserOnTest(pcfg, testFilename, outputFilename, pruningPercent=None, hor
     sys.__stderr__.write('\n')
         
 if __name__ == '__main__':
-    #print str(timeFliesPCFG)
-    #print timeFliesSent
-    #print parse(timeFliesPCFG, timeFliesSent)
+    w = 80
+    print 'Part 1'.center(w,'_')
+    print str(timeFliesPCFG)
+    print timeFliesSent
+    print parse(timeFliesPCFG, timeFliesSent)
+
+    #simpleSent = ['time','flies']
+    #chart = cky(timeFliesPCFG2, simpleSent, pruningPercent=None)
+    #printChart(chart, simpleSent, widths=(5,11,7,3,2), printBackPointers=True, printProbs=True)
+    #N = len(simpleSent)
+    #top = chart.best_in_cell(0,N,'TOP')
+    #printItem(top)
+    #s = top.backPtrLeft
+    #printItem(s) 
+
+    print 'Part 2'.center(w,'_')
     myTree = parse(timeFliesPCFG2, timeFliesSent)
     print "desired".center(70,'_')
     print desiredTimeFliesParse
