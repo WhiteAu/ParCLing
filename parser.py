@@ -144,7 +144,8 @@ def cky(pcfg, sent, pruningPercent=None):
 
             # try unary rules
             toAdd = []
-            for item in chart.iter_cell(i, i+k):
+            #for item in chart.iter_cell(i, i+k):
+            for item in chart.iter_cell(i, k):
                 for lhs,ruleProb in pcfg.iter_unary_rules_on_rhs(item.label):
                     newItem = Item(i, k, lhs, item.logProb + log(ruleProb), item)
                     toAdd.append(newItem)
