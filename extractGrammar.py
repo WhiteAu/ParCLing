@@ -172,14 +172,28 @@ nonBinaryTree = Tree("TOP", [Tree("S", [Tree("NP", [Tree("DT" , ["the"]),
                                         Tree(".", ["."])])])
 
 if __name__ == '__main__':
+    w = 80
+    print "compute PCFG on wsj.dev".center(w,'_')
     pcfg = computePCFG('wsj.dev')
-    len(pcfg)
+    print len(pcfg)
     print str(pcfg)
+
+    print "compute PCFG on wsj.train".center(w,'_')
     pcfg = computePCFG('wsj.train')
-    len(pcfg)
-    parse(pcfg, ['NN', 'VBZ', 'IN', 'DT', 'NN'])
-    parse(pcfg, ['VBZ', 'NN', 'IN', 'DT', 'NN'])
+    print len(pcfg)
+    print parse(pcfg, ['NN', 'VBZ', 'IN', 'DT', 'NN'])
+    print parse(pcfg, ['VBZ', 'NN', 'IN', 'DT', 'NN'])
     print nonBinaryTree
     print binarizeTree(nonBinaryTree)
     print debinarizeTree(binarizeTree(nonBinaryTree))
+    evaluateParser(pcfg, 'wsj.dev')
+    evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001)
+    evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.001)
+    evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.1)
+    pcfg = computePCFG('wsj.train', horizSize=2)
+    evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, horizSize=2)
+    pcfg = computePCFG('wsj.train', verticSize=2)
+    evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, verticSize=2)
+    runParserOnTest(pcfg, 'wsj.test', 'wsj.test.out', pruningPercent=0.001)
+    
     
