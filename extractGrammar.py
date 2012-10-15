@@ -1,5 +1,7 @@
 from tree import *
 from util import *
+from grammar import *
+from parser import *
 
 def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
     def binarizeTree_rec(t):
@@ -169,3 +171,15 @@ nonBinaryTree = Tree("TOP", [Tree("S", [Tree("NP", [Tree("DT" , ["the"]),
                                                     Tree("NP" , [Tree("NNP", ["CL1"])])]),
                                         Tree(".", ["."])])])
 
+if __name__ == '__main__':
+    pcfg = computePCFG('wsj.dev')
+    len(pcfg)
+    print str(pcfg)
+    pcfg = computePCFG('wsj.train')
+    len(pcfg)
+    parse(pcfg, ['NN', 'VBZ', 'IN', 'DT', 'NN'])
+    parse(pcfg, ['VBZ', 'NN', 'IN', 'DT', 'NN'])
+    print nonBinaryTree
+    print binarizeTree(nonBinaryTree)
+    print debinarizeTree(binarizeTree(nonBinaryTree))
+    
