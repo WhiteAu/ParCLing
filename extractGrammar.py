@@ -18,21 +18,9 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
             
 
         if verticSize > 1:   # your code for parent annotation!
-            depth = 0
-            #unwrap once to take t.node into account
-            for child in t:
-                child.node = child.node+'^'+t.node
-            #depth += 1
-            
-            while (depth < (verticSize - 1)):
-                childList = t[0:(len(t)-depth)]
-                Labels = [ child.node for child in childList ]
-                bigAnnotate =  '_' + '_'.join(Labels)
-                #applyList = t[0:(len(t)-depth)]
-                for child in childList:
-                    child.node = child.node+'^'+bigAnnotate             
-                depth += 1
-                
+            pN = []
+            t = _v_rec(t, pN, verticSize) 
+
 
         # if we're already binary or unary, life is good
         if len(t) <= 2:
@@ -191,6 +179,22 @@ def computePCFG(filename, horizSize=None, verticSize=1):
             pcfg.increase_rule_count( Rule(lhs, rhs) )
 
     return pcfg
+def _v_rec(t, pN, verticSize):
+    #if len(t) <= 2:
+    #    return t
+    pN.append(t.node)
+    if (len(pN) >= verticSize):
+            pN.pop(0)
+    for child in t:
+        newNode = child.node+'^'+'^'.join(pN)
+        #pN.append(child.node)
+        if child.height() > 2:
+            child = _v_rec(child, pN)
+            child.node = newNode    
+        #apply to the tree structure
+    return t
+        
+
 
 nonBinaryTree = Tree("TOP", [Tree("S", [Tree("NP", [Tree("DT" , ["the"]),
                                                     Tree("RB" , ["really"]),
