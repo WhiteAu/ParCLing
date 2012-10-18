@@ -15,10 +15,24 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
         if runFancyCode:     # this is for the competition
             ### TODO: YOUR CODE HERE
             util.raiseNotDefined()
-
+            
 
         if verticSize > 1:   # your code for parent annotation!
-            pass
+            depth = 0
+            #unwrap once to take t.node into account
+            for child in t:
+                child.node = child.node+'^'+t.node
+            #depth += 1
+            
+            while (depth < (verticSize - 1)):
+                childList = t[0:(len(t)-depth)]
+                Labels = [ child.node for child in childList ]
+                bigAnnotate =  '_' + '_'.join(Labels)
+                #applyList = t[0:(len(t)-depth)]
+                for child in childList:
+                    child.node = child.node+'^'+bigAnnotate             
+                depth += 1
+                
 
         # if we're already binary or unary, life is good
         if len(t) <= 2:
@@ -45,10 +59,11 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
         newRightChild = binarizeTree_rec(t[-1])     # last child
 
         if horizSize is not None:   # None means "infinity" -- this is your code for
-                if(len(newLeftChildren) - 1 > horizSize):
-                    newLeftChildren = t[0:horizSize-2]
-                else:
-                    newLeftChildren = t[0:-1]
+                if((len(newLeftChildren)) > horizSize):
+                    newLeftChildren = t[0:horizSize-1]
+                #else:
+                    #Grab all children except last one
+                    #newLeftChildren = t[0:-1]
                 newLeftChildLabels = [ child.node for child in newLeftChildren ]
                 newLeftChildLabel  = '_' + '_'.join(newLeftChildLabels)
                 # make them into a tree and binarize it

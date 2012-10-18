@@ -158,26 +158,26 @@ timeFliesPCFG = PCFG({
 
 timeFliesPCFG2 = PCFG({
     "TOP"  : { RHS("S")            : 1.0 },
-    "S"    : { RHS("NP", "VP")     : 0.1,
-               RHS("VP")           : 0.7,
-               RHS("NP", "VP_PP")  : 0.1,
+    "S"    : { RHS("NP", "VP")     : 0.1,#0.5
+               RHS("VP")           : 0.7,#0.2
+               RHS("NP", "VP_PP")  : 0.1,#0.2
                RHS("VP", "PP")     : 0.1 },
     "VP_PP": { RHS("VP", "PP")     : 1.0 },
-    "NP"   : { RHS("Det", "Noun")  : 0.7,
-               RHS("Noun")         : 0.3 },
-    "VP"   : { RHS("Verb", "NP")   : 0.1, # lower
-               RHS("Verb", "PP")   : 0.1,
-               RHS("Verb", "NP_PP"): 0.7, # raise
+    "NP"   : { RHS("Det", "Noun")  : 0.4, #0.7
+               RHS("Noun")         : 0.6 },#0.4
+    "VP"   : { RHS("Verb", "NP")   : 0.1, #0.6
+               RHS("Verb", "PP")   : 0.1,#0.2
+               RHS("Verb", "NP_PP"): 0.7, #0.1
                RHS("Verb")         : 0.1 },
     "NP_PP": { RHS("NP", "PP")     : 1.0 },
     "PP"   : { RHS("Prep", "NP")   : 1.0 },
     "Det"  : { RHS("an")    : 1.0 },
-    "Noun" : { RHS("time")  : 0.1,
-               RHS("flies") : 0.5,
+    "Noun" : { RHS("time")  : 0.1,#0.2
+               RHS("flies") : 0.5,#0.4
                RHS("arrow") : 0.4 },
-    "Verb" : { RHS("time")  : 0.4,
-               RHS("flies") : 0.4,
-               RHS("like")  : 0.2 },
+    "Verb" : { RHS("time")  : 0.8,#0.3
+               RHS("flies") : 0.1,#0.5
+               RHS("like")  : 0.1 },
     "Prep" : { RHS("like")  : 1.0 }
     })
 
