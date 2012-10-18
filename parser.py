@@ -3,6 +3,7 @@ from util import *
 from math import *
 from grammar import *
 from util2 import *
+from extractGrammar import *
 
 class Item:
     def __init__(self, i, j, label, logProb=0, backPtrLeft=None, backPtrRight=None):
