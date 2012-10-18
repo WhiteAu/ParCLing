@@ -18,9 +18,7 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
 
 
         if verticSize > 1:   # your code for parent annotation!
-            for i, child in enumerate(t):
-                newChild = child.node + '^' + myLabel
-                newChildren.append(binaryTree_rec(newChild))
+       
         
 
         # if we're already binary or unary, life is good
@@ -49,7 +47,7 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
 
         if horizSize is not None:   # None means "infinity" -- this is your code for
                 if(len(newLeftChildren) - 1 > horizSize):
-                    newLeftChildren = t[0:horizSize-1]
+                    newLeftChildren = t[0:horizSize-2]
                 else:
                     newLeftChildren = t[0:-1]
                 newLeftChildLabels = [ child.node for child in newLeftChildren ]
