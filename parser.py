@@ -179,6 +179,7 @@ def evaluateParser(pcfg, filename, pruningPercent=None, horizSize=None, verticSi
         sent = tree.preterminals()
         sys.__stderr__.write('.')
         res  = parse(pcfg, sent, pruningPercent)
+		if res is not None: res = reinsertWords( res, tree.leaves() )
         averageAcc += evaluate(debinarizeTree(tree), debinarizeTree(res))
         totalCount += 1.0
     sys.__stderr__.write('\n')
