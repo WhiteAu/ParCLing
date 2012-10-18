@@ -4,10 +4,10 @@ from grammar import *
 from parser import *
 
 def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
-    def binarizeTree_rec(t):
+    def binarizeTree_rec(t, pN):
         # just return pre-terminals
         if t.height() <= 2: return t
-
+        
         # otherwise we're an internal node
         # our label MUST be of the form "label^ANNOTATION" if you want to add annotation
         myLabel = t.node
@@ -18,15 +18,15 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
             
 
         if verticSize > 1:   # your code for parent annotation!
-            pN = []
-            t = _v_rec(t, pN, verticSize) 
+            pass 
+
 
 
         # if we're already binary or unary, life is good
         if len(t) <= 2:
             newChildren = []
             for i,child in enumerate(t):
-                newChildren.append(binarizeTree_rec(child))
+                newChildren.append(binarizeTree_rec(child, pN))
             return Tree(myLabel, newChildren)
 
         # else, we need to binarize.  we'll assume the LAST child is the head
@@ -41,10 +41,10 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
         newLeftChildLabel  = '_' + '_'.join(newLeftChildLabels)
         
         # make them into a tree and binarize it
-        newLeftChild = binarizeTree_rec( Tree(newLeftChildLabel, newLeftChildren) )
+        newLeftChild = binarizeTree_rec( Tree(newLeftChildLabel, newLeftChildren), pN )
 
         # binarize the right child        
-        newRightChild = binarizeTree_rec(t[-1])     # last child
+        newRightChild = binarizeTree_rec(t[-1], pN)     # last child
 
         if horizSize is not None:   # None means "infinity" -- this is your code for
                 if((len(newLeftChildren)) > horizSize):
@@ -55,18 +55,20 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
                 newLeftChildLabels = [ child.node for child in newLeftChildren ]
                 newLeftChildLabel  = '_' + '_'.join(newLeftChildLabels)
                 # make them into a tree and binarize it
-                newLeftChild = binarizeTree_rec( Tree(newLeftChildLabel, newLeftChildren) )
+                newLeftChild = binarizeTree_rec( Tree(newLeftChildLabel, newLeftChildren), pN )
         
                 # binarize the right child
-                newRightChild = binarizeTree_rec(t[-1])
+                newRightChild = binarizeTree_rec(t[-1], pN)
     
         # return the tree
         return Tree(myLabel, [newLeftChild, newRightChild])
 
     if tree is None: return None
-    return binarizeTree_rec(tree)
+    if verticSize > 1:
+        tree = _v_rec(tree, [], verticSize)
+    return binarizeTree_rec(tree, [])
 
-	
+    
 def debinarizeTree(tree):
     def removeAnnotations(s):
         if type(s) is not str: return s
@@ -138,7 +140,14 @@ def iterateTreebank(filename, horizSize=None, verticSize=1, runFancyCode=False):
     for line in h:
         tree = de_annotate(bracket_parse(line))
         if tree is None: continue
+
+        # TEMPORARY:
+        #print "Tree before binarization:"
+        #print tree.pp()
         tree = binarizeTree(tree, horizSize, verticSize, runFancyCode)
+        #print "Tree after binarization:"
+        #print tree.pp()
+
         yield tree
     h.close()
 
@@ -182,14 +191,22 @@ def computePCFG(filename, horizSize=None, verticSize=1):
 def _v_rec(t, pN, verticSize):
     #if len(t) <= 2:
     #    return t
-    pN.append(t.node)
+    #print t.node
+    pN.insert(0, t.node)
     if (len(pN) >= verticSize):
-            pN.pop(0)
+        #print pN
+        pN.pop()
+        #print 'popping'
+        #print pN
+    
     for child in t:
-        newNode = child.node+'^'+'^'.join(pN)
         #pN.append(child.node)
         if child.height() > 2:
-            child = _v_rec(child, pN)
+            newNode = child.node+'^'+'^'.join(pN)
+            #print pN
+            pNcopy = list(pN)
+            #print child.node
+            child = _v_rec(child, pNcopy, verticSize)
             child.node = newNode    
         #apply to the tree structure
     return t
@@ -208,27 +225,37 @@ nonBinaryTree = Tree("TOP", [Tree("S", [Tree("NP", [Tree("DT" , ["the"]),
 
 if __name__ == '__main__':
     w = 80
-    print "compute PCFG on wsj.dev".center(w,'_')
-    pcfg = computePCFG('wsj.dev')
-    print len(pcfg)
-    print str(pcfg)
+    #print "compute PCFG on wsj.dev".center(w,'_')
+    #pcfg = computePCFG('wsj.dev')
+    #print len(pcfg)
+    #print str(pcfg)
 
-    print "compute PCFG on wsj.train".center(w,'_')
-    pcfg = computePCFG('wsj.train')
-    print len(pcfg)
-    print parse(pcfg, ['NN', 'VBZ', 'IN', 'DT', 'NN'])
-    print parse(pcfg, ['VBZ', 'NN', 'IN', 'DT', 'NN'])
-    print nonBinaryTree
-    print binarizeTree(nonBinaryTree)
-    print debinarizeTree(binarizeTree(nonBinaryTree))
-    evaluateParser(pcfg, 'wsj.dev')
-    evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001)
-    evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.001)
-    evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.1)
-    pcfg = computePCFG('wsj.train', horizSize=2)
-    evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, horizSize=2)
+    #print "compute PCFG on wsj.train".center(w,'_')
+    #pcfg = computePCFG('wsj.train')
+    #print len(pcfg)
+    #print parse(pcfg, ['NN', 'VBZ', 'IN', 'DT', 'NN'])
+    #print parse(pcfg, ['VBZ', 'NN', 'IN', 'DT', 'NN'])
+    #print nonBinaryTree
+    #print binarizeTree(nonBinaryTree)
+    '''
+    print "Tree before binarization:"
+    tree = nonBinaryTree
+    print tree.pp()
+    tree = binarizeTree(tree, horizSize=None, verticSize=2)
+    print "Tree after binarization:"
+    print tree.pp()
+    '''
+    #print debinarizeTree(binarizeTree(nonBinaryTree))
+    #evaluateParser(pcfg, 'wsj.dev')
+    #evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001)
+    #evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.001)
+    #evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.1)
+    #pcfg = computePCFG('wsj.train', horizSize=2)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, horizSize=2)
+    # THIS IS NOT WORKING!
     pcfg = computePCFG('wsj.train', verticSize=2)
-    evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, verticSize=2)
-    runParserOnTest(pcfg, 'wsj.test', 'wsj.test.out', pruningPercent=0.001)
+    print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, verticSize=2)
+
+    #runParserOnTest(pcfg, 'wsj.test', 'wsj.test.out', pruningPercent=0.001)
     
     
