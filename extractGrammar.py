@@ -18,7 +18,6 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
 
 
         if verticSize > 1:   # your code for parent annotation!
-       
         
 
         # if we're already binary or unary, life is good
