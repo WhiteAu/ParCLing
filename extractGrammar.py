@@ -252,10 +252,24 @@ if __name__ == '__main__':
     #evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.1)
     #pcfg = computePCFG('wsj.train', horizSize=2)
     #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, horizSize=2)
-    # THIS IS NOT WORKING!
-    pcfg = computePCFG('wsj.train', verticSize=2)
-    print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, verticSize=2)
 
-    #runParserOnTest(pcfg, 'wsj.test', 'wsj.test.out', pruningPercent=0.001)
+    #pcfg = computePCFG('wsj.train', verticSize=2)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, verticSize=2)
+    pcfg = computePCFG('wsj.train', horizSize=3,verticSize=2)
+    print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.00001, horizSize=3, verticSize=2)
+    #pcfg = computePCFG('wsj.train', horizSize=2,verticSize=1)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.0001, horizSize=2, verticSize=1)
+    #pcfg = computePCFG('wsj.train', horizSize=2,verticSize=2)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.0001, horizSize=2, verticSize=2)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.0001, horizSize=9999, verticSize=2)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.0001, horizSize=2, verticSize=1)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.0001, horizSize=2, verticSize=2)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.0001, horizSize=1, verticSize=1)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.0001, horizSize=1, verticSize=2)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.0001, horizSize=9999, verticSize=1)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.0001, horizSize=9999, verticSize=3)
+    #print evaluateParser(pcfg, 'wsj.dev', pruningPercent=0.0001, horizSize=9999, verticSize=2)
+
+    print runParserOnTest(pcfg, 'wsj.test', 'wsj.test.out', pruningPercent=0.00001)
     
     
