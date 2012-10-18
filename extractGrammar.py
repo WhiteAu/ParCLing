@@ -18,8 +18,7 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
 
 
         if verticSize > 1:   # your code for parent annotation!
-            ### TODO: YOUR CODE HERE
-            util.raiseNotDefined()
+            
 
         # if we're already binary or unary, life is good
         if len(t) <= 2:
@@ -45,9 +44,21 @@ def binarizeTree(tree, horizSize=None, verticSize=1, runFancyCode=False):
         # binarize the right child        
         newRightChild = binarizeTree_rec(t[-1])     # last child
 
-        if horizSize is not None:   # None means "infinity" -- this is your code for horizontal markovization
-            ### TODO: YOUR CODE HERE
-            util.raiseNotDefined()
+        if horizSize is not None:   # None means "infinity" -- this is your code for
+                if(len(newLeftChildren) - 1 > horizSize):
+                    newLeftChildren = t[0:horizSize-1]
+                else:
+                    newLeftChildren = t[0:-1]
+                newLeftChildLabels = [ child.node for child in newLeftChildren ]
+                newLeftChildLabel  = '_' + '_'.join(newLeftChildLabels)
+                # make them into a tree and binarize it
+                newLeftChild = binarizeTree_rec( Tree(newLeftChildLabel, newLeftChildren) )
+        
+                # binarize the right child
+                newRightChild = binarizeTree_rec(t[-1])
+    
+    # return the tree
+    return Tree(myLabel, [newLeftChild, newRightChild])
         
         # return the tree
         return Tree(myLabel, [newLeftChild, newRightChild])
@@ -67,20 +78,20 @@ def debinarizeTree(tree):
     def debinarizeTree_rec(t):
         # just return pre-terminals
         if type(t) is str:  return removeAnnotations(t)
-        if t.height() &lt;= 2:
+        if t.height() <= 2:
             t.node = removeAnnotations(t.node)
             return t
-
+        
         # if this is a unary node, life is good
         if len(t) == 1:
             return Tree(removeAnnotations(t.node), [debinarizeTree_rec(t[0])])
-
+        
         # this might have been the result of binarization.  for BOTH children,
         # if their node name STARTS WITH "_" then they are binarized
         children = []
         for i in range(len(t)):
             children.append(t[i])
-
+        
         while True:
             newChildren = []
             for i in range(len(children)):
@@ -94,13 +105,13 @@ def debinarizeTree(tree):
             if len(newChildren) == len(children): # nothing changed
                 break
             children = newChildren
-
+        
         # de-binarize all the children
         for i in range(len(children)):
             children[i] = debinarizeTree_rec(children[i])
-
+        
         return Tree(removeAnnotations(t.node), children)
-
+    
     if tree is None: return None
     return debinarizeTree_rec(tree)
 
